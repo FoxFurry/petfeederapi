@@ -1,0 +1,602 @@
+openapi: "3.0.0"
+info:
+  version: "1.2.0"
+  title: "PetFeeder Gateway"
+  description: "This is PBL VI main gateway"
+  contact:
+    email: "isacartur@gmail.com"
+
+servers:
+  # Added by API Auto Mocking Plugin
+  - description: SwaggerHub API Auto Mocking
+    url: "https://virtserver.swaggerhub.com"
+  - url: "http://localhost"
+
+tags:
+  - name: "user"
+    description: "A person using mobile application"
+  - name: "device"
+    description: "Raspberry Pi device inside of pet feeder"
+  - name: "pet"
+    description: "Animal which pet feeder will serve"
+  - name: "plan"
+    description: "Plan describes diet which device will execute"
+
+paths:
+  /user/register:
+    post:
+      operationId: "userRegister"
+      tags:
+        - "user"
+      summary: "Register a new user"
+      responses:
+        200:
+          description: "Successfully registers a user"
+        400:
+          $ref: '#/components/responses/ValidationError'
+      requestBody:
+        description: ""
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserRegisterRequest"
+
+  /user/login:
+    post:
+      operationId: "userLogin"
+      tags:
+        - "user"
+      summary: "Login a new user"
+      responses:
+        200:
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserLoginResponse'
+        401:
+          $ref: '#/components/responses/UnauthorizedError'
+        404:
+          $ref: '#/components/responses/NotFoundError'
+      requestBody:
+        description: ""
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserLoginRequest'
+
+  /user/metadata:
+    get:
+      operationId: "userMetadataGet"
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - "user"
+      summary: "Get metadata for specified user"
+      responses:
+        200:
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserMetadataResponse'
+        401:
+          $ref: '#/components/responses/UnauthorizedError'
+        404:
+          $ref: '#/components/responses/NotFoundError'
+
+    patch:
+      operationId: "userMetadataPatch"
+
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - "user"
+      summary: "Partially update metadata for specified user"
+      responses:
+        200:
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserMetadataResponse'
+        401:
+          $ref: '#/components/responses/UnauthorizedError'
+        404:
+          $ref: '#/components/responses/NotFoundError'
+      requestBody:
+        description: ""
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserUpdateMetadataRequest'
+
+  /user/devices:
+    get:
+      operationId: "userDeviceGet"
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - "user"
+      summary: "Get all devices for specified user"
+      responses:
+        200:
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserRetrieveDevicesResponse'
+        401:
+          $ref: '#/components/responses/UnauthorizedError'
+        404:
+          $ref: '#/components/responses/NotFoundError'
+
+  /device:
+    post:
+      operationId: "deviceRegister"
+      tags:
+        - "device"
+      summary: "Register a new device"
+      responses:
+        200:
+          description: "Successfully registered the device"
+        401:
+          $ref: '#/components/responses/UnauthorizedError'
+        404:
+          $ref: '#/components/responses/NotFoundError'
+      requestBody:
+        description: ""
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeviceRegisterRequest'
+  /device/{device_uuid}:
+    delete:
+      operationId: "deviceDelete"
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - "device"
+      parameters:
+        - in: path
+          name: device_uuid
+          schema:
+            type: "string"
+            format: "uuid"
+          required: true
+          description: "UUID of resource to delete"
+      summary: "Delete a device with specified UUID"
+      responses:
+        200:
+          description: "Device was successfully deleted"
+        401:
+          $ref: '#/components/responses/UnauthorizedError'
+        404:
+          $ref: '#/components/responses/NotFoundError'
+
+  /device/key:
+    post:
+      operationId: "deviceKey"
+      tags:
+        - "device"
+      summary: "Generate device token"
+      responses:
+        200:
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceGetApiKeyResponse'
+        401:
+          $ref: '#/components/responses/UnauthorizedError'
+        404:
+          $ref: '#/components/responses/NotFoundError'
+      requestBody:
+        description: ""
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeviceGetApiKeyRequest'
+
+  /device/metadata:
+    get:
+      operationId: "deviceMetadataGet"
+      security:
+        - apiKeyAuth: [ ]
+      tags:
+        - "device"
+      summary: "Get metadata for specified device"
+      responses:
+        200:
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceMetadataResponse'
+        401:
+          $ref: '#/components/responses/UnauthorizedError'
+        404:
+          $ref: '#/components/responses/NotFoundError'
+
+    patch:
+      operationId: "deviceMetadataPatch"
+
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - "device"
+      summary: "Partially update metadata for specified user"
+      responses:
+        200:
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceMetadataResponse'
+        401:
+          $ref: '#/components/responses/UnauthorizedError'
+        404:
+          $ref: '#/components/responses/NotFoundError'
+      requestBody:
+        description: ""
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeviceUpdateMetadataRequest'
+
+  /pet:
+    post:
+      operationId: "petRegister"
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - "pet"
+      summary: "Register a new pet"
+      responses:
+        200:
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PetRegisterResponse'
+        401:
+          $ref: '#/components/responses/UnauthorizedError'
+        404:
+          $ref: '#/components/responses/NotFoundError'
+      requestBody:
+        description: ""
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PetRegisterRequest'
+  /pet/{pet_uuid}:
+    delete:
+      operationId: "petDelete"
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - "pet"
+      parameters:
+        - in: path
+          name: pet_uuid
+          schema:
+            type: "string"
+            format: "uuid"
+          required: true
+          description: "UUID of resource to delete"
+      summary: "Delete a pet with specified UUID"
+      responses:
+        200:
+          description: "Pet was successfully deleted"
+        401:
+          $ref: '#/components/responses/UnauthorizedError'
+        404:
+          $ref: '#/components/responses/NotFoundError'
+
+  /pet/plan:
+    post:
+      operationId: "petPlanSet"
+
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - "pet"
+      summary: "Sets plan for existing pet"
+      responses:
+        200:
+          description: "Successfully assigned a new plan"
+        401:
+          $ref: '#/components/responses/UnauthorizedError'
+        404:
+          $ref: '#/components/responses/NotFoundError'
+      requestBody:
+        description: ""
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PetSetPlanRequest'
+
+  /plan:
+    post:
+      operationId: "planCreate"
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - "plan"
+      summary: "Creates a new plan"
+      description: ""
+      responses:
+        200:
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlanCreateResponse'
+        401:
+          $ref: '#/components/responses/UnauthorizedError'
+        404:
+          $ref: '#/components/responses/NotFoundError'
+      requestBody:
+        description: ""
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PlanCreateRequest'
+  /plan/{plan_uuid}:
+    delete:
+      operationId: "planDelete"
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - "plan"
+      parameters:
+        - in: path
+          name: plan_uuid
+          schema:
+            type: "string"
+            format: "uuid"
+          required: true
+          description: "UUID of resource to delete"
+      summary: "Delete a plan with specified UUID"
+      responses:
+        200:
+          description: "Plan was successfully deleted"
+        401:
+          $ref: '#/components/responses/UnauthorizedError'
+        404:
+          $ref: '#/components/responses/NotFoundError'
+components:
+  schemas:
+
+    # USER --------------------------------------------------------------------
+
+    # USER REGISTER----------------------------------------------------------
+    UserRegisterRequest:
+      $ref: "#/components/schemas/UserCredentials"
+
+    # USER LOGIN-------------------------------------------------------------
+    UserLoginRequest:
+      $ref: "#/components/schemas/UserCredentials"
+
+    UserLoginResponse:
+      $ref: "#/components/schemas/Token"
+
+    # USER UPDATE METADATA---------------------------------------------------
+    UserUpdateMetadataRequest:
+      $ref: "#/components/schemas/UserMetadata"
+
+    UserMetadataResponse:
+      $ref: "#/components/schemas/UserMetadata"
+
+    UserRetrieveDevicesResponse:
+      type: "object"
+      properties:
+        devices:
+          type: array
+          description: "Test array"
+          items:
+            $ref: "#/components/schemas/DeviceMetadata"
+
+    # DEVICE ------------------------------------------------------------------
+
+    # DEVICE REGISTER -------------------------------------------------------
+    DeviceRegisterRequest:
+      $ref: "#/components/schemas/Device"
+
+    # DEVICE GET API KEY ----------------------------------------------------
+    DeviceGetApiKeyRequest:
+      $ref: "#/components/schemas/Device"
+
+    DeviceGetApiKeyResponse:
+      $ref: "#/components/schemas/ApiKey"
+
+    # DEVICE UPDATE METADATA ------------------------------------------------
+    DeviceUpdateMetadataRequest:
+      $ref: "#/components/schemas/DeviceMetadata"
+
+    DeviceMetadataResponse:
+      $ref: "#/components/schemas/DeviceMetadata"
+
+    # PET ---------------------------------------------------------------------
+
+    # PET REGISTER ----------------------------------------------------------
+    PetRegisterRequest:
+      allOf:
+        - $ref: '#/components/schemas/Pet'
+        - type: "object"
+          properties:
+            plan_uuid:
+              type: "string"
+              format: "uuid"
+              description: "Plan UUID"
+
+    PetRegisterResponse:
+      $ref: "#/components/schemas/Pet"
+
+    # PET SET PLAN ---------------------------------------------------------
+    PetSetPlanRequest:
+        type: "object"
+        properties:
+          pet_uuid:
+            type: "string"
+            format: "uuid"
+            description: "Pet UUID"
+          plan_uuid:
+            type: "string"
+            format: "uuid"
+            description: "Plan UUID"
+
+    # PLAN -------------------------------------------------------------------
+
+    # PLAN CREATE  ---------------------------------------------------------
+    PlanCreateRequest:
+      type: "object"
+      properties:
+        plan_data:
+          type: "string"
+          description: "TBD: Define data which is required for a plan"
+
+    PlanCreateResponse:
+      $ref: "#/components/schemas/Plan"
+
+    # MISC MODELS
+
+    # USER ---------------------------------------------------------------------
+    UserCredentials:
+      type: "object"
+      description: "test"
+      required:
+        - mail
+        - password
+      properties:
+        mail:
+          type: "string"
+          description: "Must be a valid email"
+        password:
+          type: "string"
+          description: "Must be 8 characters long. Include at least 1 special character, at least 1 digit and at least one upper case character"
+
+    UserMetadata:
+      type: "object"
+      properties:
+        user_name:
+          type: "string"
+          description: "Name of the user"
+        device_num:
+          type: "integer"
+          format: "int64"
+          description: "Number of active devices of the user"
+        reserved:
+          type: "string"
+          description: "Reserved for future fields"
+
+    # DEVICE -------------------------------------------------------------------
+    Device:
+      type: "object"
+      properties:
+        device_uuid:
+          type: "string"
+          format: "uuid"
+          description: "Device which will be assigned to this pet"
+
+    DeviceMetadata:
+      type: "object"
+      properties:
+        device_name:
+          type: "string"
+          description: "Name of the device"
+        assignedPet:
+          $ref: "#/components/schemas/Pet"
+        assignedPlan:
+          $ref: "#/components/schemas/Plan"
+
+    # PET ----------------------------------------------------------------------
+    Pet:
+      type: "object"
+      properties:
+        pet_name:
+          type: "string"
+          description: "Name of the pet"
+        pet_uuid:
+          type: "string"
+          format: "uuid"
+          description: "Pet UUID"
+
+    # PLAN ---------------------------------------------------------------------
+
+
+    Plan:
+        type: "object"
+        properties:
+          plan_name:
+            type: "string"
+            description: "Name of the plan"
+          pet_uuid:
+            type: "string"
+            format: "uuid"
+            description: "UUID of the pet"
+          plan_data:
+            type: "string"
+            description: "TBD: Define data which is required for a plan"
+          plan_uuid:
+            type: "string"
+            format: "uuid"
+            description: "Plan UUID"
+
+    Token:
+      type: "object"
+      properties:
+        token:
+          type: "string"
+          description: "HMAC JWT token"
+
+    ApiKey:
+      type: "object"
+      properties:
+        key:
+          type: "string"
+          description: "API key for Raspberry device"
+
+    Error:
+      type: "object"
+      properties:
+        error:
+          type: "string"
+          description: "Error message"
+
+  securitySchemes:
+    bearerAuth:
+      type: "http"
+      scheme: "bearer"
+      bearerFormat: JWT
+
+    apiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-KEY
+
+  responses:
+    ValidationError:
+      description: "Request fields failed validation"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+
+    UnauthorizedError:
+      description: "Auth token is invalid or missing"
+      headers:
+        WWW_Authenticate:
+          schema:
+            type: "string"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+
+    NotFoundError:
+      description: "Not found"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"

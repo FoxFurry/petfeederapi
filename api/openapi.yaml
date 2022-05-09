@@ -1,0 +1,796 @@
+openapi: 3.0.0
+info:
+  contact:
+    email: isacartur@gmail.com
+  description: This is PBL VI main gateway
+  title: PetFeeder Gateway
+  version: 1.2.0
+servers:
+- description: SwaggerHub API Auto Mocking
+  url: https://virtserver.swaggerhub.com
+- url: http://localhost
+tags:
+- description: A person using mobile application
+  name: user
+- description: Raspberry Pi device inside of pet feeder
+  name: device
+- description: Animal which pet feeder will serve
+  name: pet
+- description: Plan describes diet which device will execute
+  name: plan
+paths:
+  /user/register:
+    post:
+      operationId: userRegister
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRegisterRequest'
+        description: ""
+      responses:
+        "200":
+          description: Successfully registers a user
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Request fields failed validation
+      summary: Register a new user
+      tags:
+      - user
+  /user/login:
+    post:
+      operationId: userLogin
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserLoginRequest'
+        description: ""
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserLoginResponse'
+          description: ""
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Auth token is invalid or missing
+          headers:
+            WWW_Authenticate:
+              explode: false
+              schema:
+                type: string
+              style: simple
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Not found
+      summary: Login a new user
+      tags:
+      - user
+  /user/metadata:
+    get:
+      operationId: userMetadataGet
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserMetadataResponse'
+          description: ""
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Auth token is invalid or missing
+          headers:
+            WWW_Authenticate:
+              explode: false
+              schema:
+                type: string
+              style: simple
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Not found
+      security:
+      - bearerAuth: []
+      summary: Get metadata for specified user
+      tags:
+      - user
+    patch:
+      operationId: userMetadataPatch
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserUpdateMetadataRequest'
+        description: ""
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserMetadataResponse'
+          description: ""
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Auth token is invalid or missing
+          headers:
+            WWW_Authenticate:
+              explode: false
+              schema:
+                type: string
+              style: simple
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Not found
+      security:
+      - bearerAuth: []
+      summary: Partially update metadata for specified user
+      tags:
+      - user
+  /user/devices:
+    get:
+      operationId: userDeviceGet
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserRetrieveDevicesResponse'
+          description: ""
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Auth token is invalid or missing
+          headers:
+            WWW_Authenticate:
+              explode: false
+              schema:
+                type: string
+              style: simple
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Not found
+      security:
+      - bearerAuth: []
+      summary: Get all devices for specified user
+      tags:
+      - user
+  /device:
+    post:
+      operationId: deviceRegister
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeviceRegisterRequest'
+        description: ""
+      responses:
+        "200":
+          description: Successfully registered the device
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Auth token is invalid or missing
+          headers:
+            WWW_Authenticate:
+              explode: false
+              schema:
+                type: string
+              style: simple
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Not found
+      summary: Register a new device
+      tags:
+      - device
+  /device/{device_uuid}:
+    delete:
+      operationId: deviceDelete
+      parameters:
+      - description: UUID of resource to delete
+        explode: false
+        in: path
+        name: device_uuid
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      responses:
+        "200":
+          description: Device was successfully deleted
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Auth token is invalid or missing
+          headers:
+            WWW_Authenticate:
+              explode: false
+              schema:
+                type: string
+              style: simple
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Not found
+      security:
+      - bearerAuth: []
+      summary: Delete a device with specified UUID
+      tags:
+      - device
+  /device/key:
+    post:
+      operationId: deviceKey
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeviceGetApiKeyRequest'
+        description: ""
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceGetApiKeyResponse'
+          description: ""
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Auth token is invalid or missing
+          headers:
+            WWW_Authenticate:
+              explode: false
+              schema:
+                type: string
+              style: simple
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Not found
+      summary: Generate device token
+      tags:
+      - device
+  /device/metadata:
+    get:
+      operationId: deviceMetadataGet
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceMetadataResponse'
+          description: ""
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Auth token is invalid or missing
+          headers:
+            WWW_Authenticate:
+              explode: false
+              schema:
+                type: string
+              style: simple
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Not found
+      security:
+      - apiKeyAuth: []
+      summary: Get metadata for specified device
+      tags:
+      - device
+    patch:
+      operationId: deviceMetadataPatch
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeviceUpdateMetadataRequest'
+        description: ""
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceMetadataResponse'
+          description: ""
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Auth token is invalid or missing
+          headers:
+            WWW_Authenticate:
+              explode: false
+              schema:
+                type: string
+              style: simple
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Not found
+      security:
+      - bearerAuth: []
+      summary: Partially update metadata for specified user
+      tags:
+      - device
+  /pet:
+    post:
+      operationId: petRegister
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PetRegisterRequest'
+        description: ""
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PetRegisterResponse'
+          description: ""
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Auth token is invalid or missing
+          headers:
+            WWW_Authenticate:
+              explode: false
+              schema:
+                type: string
+              style: simple
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Not found
+      security:
+      - bearerAuth: []
+      summary: Register a new pet
+      tags:
+      - pet
+  /pet/{pet_uuid}:
+    delete:
+      operationId: petDelete
+      parameters:
+      - description: UUID of resource to delete
+        explode: false
+        in: path
+        name: pet_uuid
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      responses:
+        "200":
+          description: Pet was successfully deleted
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Auth token is invalid or missing
+          headers:
+            WWW_Authenticate:
+              explode: false
+              schema:
+                type: string
+              style: simple
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Not found
+      security:
+      - bearerAuth: []
+      summary: Delete a pet with specified UUID
+      tags:
+      - pet
+  /pet/plan:
+    post:
+      operationId: petPlanSet
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PetSetPlanRequest'
+        description: ""
+      responses:
+        "200":
+          description: Successfully assigned a new plan
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Auth token is invalid or missing
+          headers:
+            WWW_Authenticate:
+              explode: false
+              schema:
+                type: string
+              style: simple
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Not found
+      security:
+      - bearerAuth: []
+      summary: Sets plan for existing pet
+      tags:
+      - pet
+  /plan:
+    post:
+      description: ""
+      operationId: planCreate
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PlanCreateRequest'
+        description: ""
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlanCreateResponse'
+          description: ""
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Auth token is invalid or missing
+          headers:
+            WWW_Authenticate:
+              explode: false
+              schema:
+                type: string
+              style: simple
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Not found
+      security:
+      - bearerAuth: []
+      summary: Creates a new plan
+      tags:
+      - plan
+  /plan/{plan_uuid}:
+    delete:
+      operationId: planDelete
+      parameters:
+      - description: UUID of resource to delete
+        explode: false
+        in: path
+        name: plan_uuid
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      responses:
+        "200":
+          description: Plan was successfully deleted
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Auth token is invalid or missing
+          headers:
+            WWW_Authenticate:
+              explode: false
+              schema:
+                type: string
+              style: simple
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Not found
+      security:
+      - bearerAuth: []
+      summary: Delete a plan with specified UUID
+      tags:
+      - plan
+components:
+  responses:
+    ValidationError:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+      description: Request fields failed validation
+    UnauthorizedError:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+      description: Auth token is invalid or missing
+      headers:
+        WWW_Authenticate:
+          explode: false
+          schema:
+            type: string
+          style: simple
+    NotFoundError:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+      description: Not found
+  schemas:
+    UserRegisterRequest:
+      $ref: '#/components/schemas/UserCredentials'
+    UserLoginRequest:
+      $ref: '#/components/schemas/UserCredentials'
+    UserLoginResponse:
+      $ref: '#/components/schemas/Token'
+    UserUpdateMetadataRequest:
+      $ref: '#/components/schemas/UserMetadata'
+    UserMetadataResponse:
+      $ref: '#/components/schemas/UserMetadata'
+    UserRetrieveDevicesResponse:
+      example:
+        devices:
+        - device_name: device_name
+          assignedPet:
+            pet_name: pet_name
+            pet_uuid: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          assignedPlan:
+            plan_uuid: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            pet_uuid: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            plan_data: plan_data
+            plan_name: plan_name
+        - device_name: device_name
+          assignedPet:
+            pet_name: pet_name
+            pet_uuid: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          assignedPlan:
+            plan_uuid: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            pet_uuid: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            plan_data: plan_data
+            plan_name: plan_name
+      properties:
+        devices:
+          description: Test array
+          items:
+            $ref: '#/components/schemas/DeviceMetadata'
+          type: array
+      type: object
+    DeviceRegisterRequest:
+      $ref: '#/components/schemas/Device'
+    DeviceGetApiKeyRequest:
+      $ref: '#/components/schemas/Device'
+    DeviceGetApiKeyResponse:
+      $ref: '#/components/schemas/ApiKey'
+    DeviceUpdateMetadataRequest:
+      $ref: '#/components/schemas/DeviceMetadata'
+    DeviceMetadataResponse:
+      $ref: '#/components/schemas/DeviceMetadata'
+    PetRegisterRequest:
+      allOf:
+      - $ref: '#/components/schemas/Pet'
+      - $ref: '#/components/schemas/PetRegisterRequest_allOf'
+    PetRegisterResponse:
+      $ref: '#/components/schemas/Pet'
+    PetSetPlanRequest:
+      example:
+        plan_uuid: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        pet_uuid: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+      properties:
+        pet_uuid:
+          description: Pet UUID
+          format: uuid
+          type: string
+        plan_uuid:
+          description: Plan UUID
+          format: uuid
+          type: string
+      type: object
+    PlanCreateRequest:
+      example:
+        plan_data: plan_data
+      properties:
+        plan_data:
+          description: "TBD: Define data which is required for a plan"
+          type: string
+      type: object
+    PlanCreateResponse:
+      $ref: '#/components/schemas/Plan'
+    UserCredentials:
+      description: test
+      example:
+        password: password
+        mail: mail
+      properties:
+        mail:
+          description: Must be a valid email
+          type: string
+        password:
+          description: "Must be 8 characters long. Include at least 1 special character,\
+            \ at least 1 digit and at least one upper case character"
+          type: string
+      required:
+      - mail
+      - password
+      type: object
+    UserMetadata:
+      example:
+        reserved: reserved
+        user_name: user_name
+        device_num: 0
+      properties:
+        user_name:
+          description: Name of the user
+          type: string
+        device_num:
+          description: Number of active devices of the user
+          format: int64
+          type: integer
+        reserved:
+          description: Reserved for future fields
+          type: string
+      type: object
+    Device:
+      example:
+        device_uuid: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+      properties:
+        device_uuid:
+          description: Device which will be assigned to this pet
+          format: uuid
+          type: string
+      type: object
+    DeviceMetadata:
+      example:
+        device_name: device_name
+        assignedPet:
+          pet_name: pet_name
+          pet_uuid: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        assignedPlan:
+          plan_uuid: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          pet_uuid: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          plan_data: plan_data
+          plan_name: plan_name
+      properties:
+        device_name:
+          description: Name of the device
+          type: string
+        assignedPet:
+          $ref: '#/components/schemas/Pet'
+        assignedPlan:
+          $ref: '#/components/schemas/Plan'
+      type: object
+    Pet:
+      example:
+        pet_name: pet_name
+        pet_uuid: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+      properties:
+        pet_name:
+          description: Name of the pet
+          type: string
+        pet_uuid:
+          description: Pet UUID
+          format: uuid
+          type: string
+      type: object
+    Plan:
+      example:
+        plan_uuid: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        pet_uuid: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        plan_data: plan_data
+        plan_name: plan_name
+      properties:
+        plan_name:
+          description: Name of the plan
+          type: string
+        pet_uuid:
+          description: UUID of the pet
+          format: uuid
+          type: string
+        plan_data:
+          description: "TBD: Define data which is required for a plan"
+          type: string
+        plan_uuid:
+          description: Plan UUID
+          format: uuid
+          type: string
+      type: object
+    Token:
+      example:
+        token: token
+      properties:
+        token:
+          description: HMAC JWT token
+          type: string
+      type: object
+    ApiKey:
+      example:
+        key: key
+      properties:
+        key:
+          description: API key for Raspberry device
+          type: string
+      type: object
+    Error:
+      properties:
+        error:
+          description: Error message
+          type: string
+      type: object
+    PetRegisterRequest_allOf:
+      properties:
+        plan_uuid:
+          description: Plan UUID
+          format: uuid
+          type: string
+      type: object
+  securitySchemes:
+    bearerAuth:
+      bearerFormat: JWT
+      scheme: bearer
+      type: http
+    apiKeyAuth:
+      in: header
+      name: X-API-KEY
+      type: apiKey
